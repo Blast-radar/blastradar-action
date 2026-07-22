@@ -4,7 +4,7 @@ branding:
   icon: 'zap'
   color: 'red'
 inputs:
-  anthropic-api-key:
+  anthropic_api_key:
     description: 'Anthropic API key'
     required: true
   threshold:
@@ -14,6 +14,3 @@ inputs:
 runs:
   using: 'node20'
   main: 'index.js'
-  env:
-    ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
-    INPUT_THRESHOLD: ${{ inputs.threshold }}

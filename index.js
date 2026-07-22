@@ -1,8 +1,8 @@
 const https = require('https');
 const { execSync } = require('child_process');
 
-const apiKey = process.env.ANTHROPIC_API_KEY || process.env.INPUT_ANTHROPIC_API_KEY;
-const threshold = parseInt(process.env.INPUT_THRESHOLD || '7');
+const apiKey = process.env['INPUT_ANTHROPIC_API_KEY'];
+const threshold = parseInt(process.env['INPUT_THRESHOLD'] || '7');
 
 function getDiff() {
   try {
@@ -73,25 +73,18 @@ ${diff}`
   });
 }
 
-function setOutput(name, value) {
-  console.log(`::set-output name=${name}::${value}`);
-}
-
-function notice(msg) {
-  console.log(`::notice::${msg}`);
-}
-
-function error(msg) {
-  console.log(`::error::${msg}`);
-}
-
 async function run() {
   console.log('⚡ BlastRadar: Scanning PR for production risk...\n');
+
+  if (!apiKey) {
+    console.log('::error::BlastRadar: anthropic_api_key secret is not set. Add it in repo Settings → Secrets → Actions.');
+    process.exit(1);
+  }
 
   const diff = getDiff();
 
   if (!diff || diff.trim().length === 0) {
-    notice('No diff detected — skipping analysis.');
+    console.log('::notice::No diff detected — skipping analysis.');
     process.exit(0);
   }
 
@@ -111,20 +104,17 @@ async function run() {
       });
     }
 
-    setOutput('risk-score', score);
-    setOutput('verdict', result.verdict);
-
     console.log('');
 
     if (score >= threshold) {
-      error(`BlastRadar: Risk score ${score}/10 exceeds threshold of ${threshold}/10. Review required.`);
+      console.log(`::error::BlastRadar: Risk score ${score}/10 exceeds threshold of ${threshold}/10. Review required before merging.`);
       process.exit(1);
     } else {
-      notice(`BlastRadar: Risk score ${score}/10 is within acceptable threshold.`);
+      console.log(`::notice::BlastRadar: Risk score ${score}/10 is within acceptable threshold.`);
       process.exit(0);
     }
   } catch (err) {
-    error('BlastRadar analysis failed: ' + err.message);
+    console.log('::error::BlastRadar analysis failed: ' + err.message);
     process.exit(0);
   }
 }
