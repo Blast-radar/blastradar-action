@@ -1,7 +1,7 @@
 const https = require('https');
 const { execSync } = require('child_process');
 
-const apiKey = process.env.ANTHROPIC_API_KEY;
+const apiKey = process.env.ANTHROPIC_API_KEY || process.env.INPUT_ANTHROPIC_API_KEY;
 const threshold = parseInt(process.env.INPUT_THRESHOLD || '7');
 
 function getDiff() {
