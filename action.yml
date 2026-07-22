@@ -1,0 +1,16 @@
+name: 'BlastRadar'
+description: 'Automatic production risk scoring for pull requests'
+branding:
+  icon: 'zap'
+  color: 'red'
+inputs:
+  anthropic-api-key:
+    description: 'Anthropic API key'
+    required: true
+  threshold:
+    description: 'Risk score threshold to fail the check (1-10)'
+    required: false
+    default: '7'
+runs:
+  using: 'node20'
+  main: 'index.js'
